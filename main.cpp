@@ -1,13 +1,13 @@
-
-
 #include "sqlite3/SQLlite3.hpp"
+
+// g++ main.cpp sqlite3/sqlite3.o sqlite3/SQLite3.cpp -o main && ./main
 
 int main(int argc, char** argv){
     SQLite3 db("database.sql");
 
-    // db.execute_query("CREATE TABLE test("
-    //     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-    //     "name TEXT NOT NULL )");
+    db.execute("CREATE TABLE test("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "name TEXT NOT NULL )");
 
     // db.execute_query("INSERT INTO test(name) VALUES('Bogdan');");
     // db.execute_query("INSERT INTO test(name) VALUES('Marcin');");
