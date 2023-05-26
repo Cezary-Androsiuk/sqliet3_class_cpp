@@ -4,13 +4,13 @@
 
 int main(int argc, char** argv){
 
-    {
-        SQLite3 db("database.sql");
+    // {
+    //     SQLite3 db("database.sql");
 
-        db.execute("CREATE TABLE test3("
-            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            "name TEXT NOT NULL, second_name TEXT NOT NULL )");
-    }
+    //     db.execute("CREATE TABLE test3("
+    //         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+    //         "name TEXT NOT NULL, second_name TEXT NOT NULL )");
+    // }
 
     // db.execute_query("INSERT INTO test(name) VALUES('Bogdan');");
     // db.execute_query("INSERT INTO test(name) VALUES('Marcin');");
@@ -56,6 +56,7 @@ int main(int argc, char** argv){
 
     {
         SQLite3 db("database.sql");
+        // db.prepare_query("SELECT * FROM test2");
 
         // std::vector<std::string> vs = db.execute("SELECT * FROM test3");
         // std::vector<std::string> vs = db.select_prepared_query("INSERT INTO test2 (name, second_name) VALUES ('test', 'test2');");

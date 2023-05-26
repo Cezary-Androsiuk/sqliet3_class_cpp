@@ -18,7 +18,6 @@ class SQLite3{
     bool db_open;
 
     bool prep_started;
-    std::string prep_query;
     sqlite3_stmt* prep_stmt;
 
 public:
@@ -37,7 +36,9 @@ public:
     void bind_text_param(int pos, const std::string& param);
     void bind_clear();
 
-    std::vector<std::string> execute_prepared(const std::string& query);
+    std::vector<std::string> execute_prepared(bool keep_open = true);
+
+    void close_prepared();
 };
 
 #endif
