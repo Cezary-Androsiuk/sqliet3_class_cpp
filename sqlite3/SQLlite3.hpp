@@ -38,6 +38,7 @@ public:
     void bind_int_param(int pos, int param);
     void bind_double_param(int pos, double param);
     void bind_text_param(int pos, const std::string& param);
+    void bind_clear();
 protected:
     void execute_prepared_query(const std::string& query);
     std::vector<std::string> select_prepared_query(const std::string& query);

@@ -28,10 +28,30 @@ SQLite3::~SQLite3(){
 
 std::string SQLite3::read_row(sqlite3_stmt* stmt) const{
     std::string result = "| ";
-
-    result += std::to_string(sqlite3_column_int(stmt, 0)) + " | ";
-    result += std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt,1))) + " |";
-
+    int column_count = sqlite3_data_count(stmt);
+    for(int i=0; i<column_count; i++){
+        switch (sqlite3_column_type(stmt, i)){
+        case SQLITE_INTEGER:
+            result += std::to_string(sqlite3_column_int(stmt, i));
+            break;
+        case SQLITE_FLOAT:
+            result += std::to_string(sqlite3_column_double(stmt, i));
+            break;
+        case SQLITE_TEXT:
+            result += reinterpret_cast<const char*>(sqlite3_column_text(stmt, i));
+            break;
+        case SQLITE_BLOB:
+            result += "{BLOB}"; //  binary labge object
+            break;
+        case SQLITE_NULL:
+            result += "NULL";
+            break;
+        default:
+            result += "{unknown}"; // unknown data type
+            break;
+        }
+        result += " | ";
+    }
     return result;
 }
 
@@ -62,7 +82,6 @@ std::vector<std::string> SQLite3::select_query(const std::string& query){
     }
     feedback.push_back(c_name);
 
-
     while(sqlite3_step(stmt) == SQLITE_ROW)
         feedback.push_back(this->read_row(stmt));
 
@@ -76,7 +95,7 @@ std::vector<std::string> SQLite3::execute(const std::string& query){
         for(const char& c : query)
             cpq.push_back(std::toupper(c));
 
-        if(cpq.find("SELECT") != std::string::npos){
+        if(cpq.find("SELE") != std::string::npos){
             return this->select_query(query);
         }
         else{
@@ -142,6 +161,10 @@ void SQLite3::bind_text_param(int pos, const std::string& param){
     else{
         _SKIPPED_PREP_
     }
+}
+
+void SQLite3::bind_clear(){
+    sqlite3_clear_bindings(this->prep_stmt);
 }
 
 
