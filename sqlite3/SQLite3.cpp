@@ -81,7 +81,7 @@ void SQLite3::prepare_query(const std::string& query){
 }
 
 
-void SQLite3::bind_int_param(int pos, int param){
+void SQLite3::bind_int(int pos, int param){
     if(this->prep_started){
         int rc = sqlite3_bind_int(this->prep_stmt, pos, param);
         if(rc != SQLITE_OK){
@@ -93,7 +93,7 @@ void SQLite3::bind_int_param(int pos, int param){
         _PF_SKIPPED_PREP_
     }
 }
-void SQLite3::bind_double_param(int pos, double param){
+void SQLite3::bind_double(int pos, double param){
     if(this->prep_started){
         int rc = sqlite3_bind_double(this->prep_stmt, pos, param);
         if(rc != SQLITE_OK){
@@ -105,7 +105,7 @@ void SQLite3::bind_double_param(int pos, double param){
         _PF_SKIPPED_PREP_
     }
 }
-void SQLite3::bind_text_param(int pos, const std::string& param){
+void SQLite3::bind_text(int pos, const std::string& param){
     if(this->prep_started){
         int rc = sqlite3_bind_text(this->prep_stmt, pos, param.c_str(), -1, nullptr);
         if(rc != SQLITE_OK){
@@ -117,9 +117,9 @@ void SQLite3::bind_text_param(int pos, const std::string& param){
         _PF_SKIPPED_PREP_
     }
 }
-void SQLite3::bind_null_param(int pos){
+void SQLite3::bind_null(int pos){
     if(this->prep_started){
-        int rc = sqlite3_bind_null(this->prep_stmt, pos)
+        int rc = sqlite3_bind_null(this->prep_stmt, pos);
         if(rc != SQLITE_OK){
             _PF_ERROR_
             return;
