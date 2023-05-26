@@ -8,17 +8,28 @@
 
 #include "sqlite3.h"
 
-#define _EXECUTE_ERROR_ fprintf(stderr, "%s error\n", __func__);
-#define _EXECUTE_ERROR_MSG_(msg) fprintf(stderr, "%s error: %s\n", __func__, msg);
-#define _SKIPPED_OPEN_ fprintf(stderr, "%s skipped - open database first\n", __func__);
-#define _SKIPPED_PREP_ fprintf(stderr, "%s skipped - prepare query first\n", __func__);
+#define PRINT_MESSAGES
+
+#ifdef PRINT_MESSAGES
+#define _PF_ERROR_ fprintf(stderr, "%s() error\n", __func__);
+#define _PF_STMT_CLOSE_ fprintf(stderr, "cannot close prep_stmt in %s!\n", __func__);
+#define _PF_STMT_RESET_ fprintf(stderr, "cannot close prep_stmt in %s!\n", __func__);
+#define _PF_SKIPPED_OPEN_ fprintf(stderr, "%s() skipped - open database first\n", __func__);
+#define _PF_SKIPPED_PREP_ fprintf(stderr, "%s() skipped - prepare query first\n", __func__);
+#else
+#define _PF_ERROR_ ;
+#define _PF_STMT_CLOSE_ ;
+#define _PF_STMT_RESET_ ;
+#define _PF_SKIPPED_OPEN_ ;
+#define _PF_SKIPPED_PREP_ ;
+#endif // PRINT_MESSAGES
 
 class SQLite3{
     sqlite3* db;
     bool db_open;
 
-    bool prep_started;
     sqlite3_stmt* prep_stmt;
+    bool prep_started;
 
 public:
     SQLite3(const std::string& path);

@@ -56,6 +56,7 @@ int main(int argc, char** argv){
 
     {
         SQLite3 db("database.sql");
+        db.execute("sdasdadsa");
         // db.prepare_query("SELECT * FROM test2");
 
         // std::vector<std::string> vs = db.execute("SELECT * FROM test3");
