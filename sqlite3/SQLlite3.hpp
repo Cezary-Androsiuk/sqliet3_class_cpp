@@ -27,9 +27,6 @@ public:
 
 protected:
     std::string read_row(sqlite3_stmt* stmt) const;
-
-    void execute_query(const std::string& query);
-    std::vector<std::string> select_query(const std::string& query);
 public:
     std::vector<std::string> execute(const std::string& query);
 
@@ -39,10 +36,7 @@ public:
     void bind_double_param(int pos, double param);
     void bind_text_param(int pos, const std::string& param);
     void bind_clear();
-protected:
-    void execute_prepared_query(const std::string& query);
-    std::vector<std::string> select_prepared_query(const std::string& query);
-public:
+
     std::vector<std::string> execute_prepared(const std::string& query);
 };
 

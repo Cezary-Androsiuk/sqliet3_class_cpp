@@ -27,9 +27,8 @@ SQLite3::~SQLite3(){
 
 
 std::string SQLite3::read_row(sqlite3_stmt* stmt) const{
-    std::string result = "| ";
-    int column_count = sqlite3_data_count(stmt);
-    for(int i=0; i<column_count; i++){
+    std::string result;
+    for(int i=0; i<sqlite3_data_count(stmt); i++){
         switch (sqlite3_column_type(stmt, i)){
         case SQLITE_INTEGER:
             result += std::to_string(sqlite3_column_int(stmt, i));
@@ -52,55 +51,35 @@ std::string SQLite3::read_row(sqlite3_stmt* stmt) const{
         }
         result += " | ";
     }
+    if(result.size() > 0) 
+        result = std::string("| ") + result;
+
     return result;
-}
-
-
-void SQLite3::execute_query(const std::string& query){
-    char* errMSG = nullptr;
-    int rc = sqlite3_exec(this->db, query.c_str(), nullptr, nullptr, &errMSG);
-    
-    if(rc != SQLITE_OK){
-        _EXECUTE_ERROR_MSG_(errMSG)
-        sqlite3_free(errMSG);
-        return;
-    }
-}
-
-std::vector<std::string> SQLite3::select_query(const std::string& query){
-    std::vector<std::string> feedback;
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(this->db, query.c_str(), -1, &stmt, nullptr);
-    if(rc != SQLITE_OK){
-        _EXECUTE_ERROR_
-        return feedback;
-    }
-
-    std::string c_name = "|";
-    for(int i=0; i<sqlite3_column_count(stmt); i++){
-        c_name += std::string(sqlite3_column_name(stmt, i)) + " | ";
-    }
-    feedback.push_back(c_name);
-
-    while(sqlite3_step(stmt) == SQLITE_ROW)
-        feedback.push_back(this->read_row(stmt));
-
-    sqlite3_finalize(stmt);
-    return feedback;
 }
 
 std::vector<std::string> SQLite3::execute(const std::string& query){
     if(this->db_open){
-        std::string cpq;
-        for(const char& c : query)
-            cpq.push_back(std::toupper(c));
+        std::vector<std::string> feedback;
+        sqlite3_stmt* stmt;
+        int rc = sqlite3_prepare_v2(this->db, query.c_str(), -1, &stmt, nullptr);
+        if(rc != SQLITE_OK){
+            _EXECUTE_ERROR_
+            return feedback;
+        }
 
-        if(cpq.find("SELE") != std::string::npos){
-            return this->select_query(query);
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+            feedback.push_back(this->read_row(stmt));
+
+        if(feedback.size() > 0){
+            std::string c_name = "|";
+            for(int i=0; i<sqlite3_column_count(stmt); i++){
+                c_name += std::string(sqlite3_column_name(stmt, i)) + " | ";
+            }
+            feedback.push_back(c_name);
         }
-        else{
-            this->execute_query(query);
-        }
+
+        sqlite3_finalize(stmt);
+        return feedback;
     }
     else{
         _SKIPPED_OPEN_
@@ -168,52 +147,29 @@ void SQLite3::bind_clear(){
 }
 
 
-void SQLite3::execute_prepared_query(const std::string& query){
-    char* errMSG = nullptr;
-    int rc = sqlite3_exec(this->db, query.c_str(), nullptr, nullptr, &errMSG);
-    
-    if(rc != SQLITE_OK){
-        _EXECUTE_ERROR_MSG_(errMSG)
-        sqlite3_free(errMSG);
-        return;
-    }
-}
-
-std::vector<std::string> SQLite3::select_prepared_query(const std::string& query){
-    std::vector<std::string> feedback;
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(this->db, query.c_str(), -1, &stmt, nullptr);
-    if(rc != SQLITE_OK){
-        _EXECUTE_ERROR_
-        return feedback;
-    }
-
-    std::string c_name = "|";
-    for(int i=0; i<sqlite3_column_count(stmt); i++){
-        c_name += std::string(sqlite3_column_name(stmt, i)) + " | ";
-    }
-    feedback.push_back(c_name);
-
-
-    while(sqlite3_step(stmt) == SQLITE_ROW)
-        feedback.push_back(this->read_row(stmt));
-
-    sqlite3_finalize(stmt);
-    return feedback;
-}
-
 std::vector<std::string> SQLite3::execute_prepared(const std::string& query){
     if(this->prep_started){
-        std::string cpq;
-        for(const char& c : query)
-            cpq.push_back(std::toupper(c));
+        std::vector<std::string> feedback;
+        sqlite3_stmt* stmt;
+        int rc = sqlite3_prepare_v2(this->db, query.c_str(), -1, &stmt, nullptr);
+        if(rc != SQLITE_OK){
+            _EXECUTE_ERROR_
+            return feedback;
+        }
 
-        if(cpq.find("SELECT") != std::string::npos){
-            return this->select_prepared_query(query);
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+            feedback.push_back(this->read_row(stmt));
+
+        if(feedback.size() > 0){
+            std::string c_name = "|";
+            for(int i=0; i<sqlite3_column_count(stmt); i++){
+                c_name += std::string(sqlite3_column_name(stmt, i)) + " | ";
+            }
+            feedback.push_back(c_name);
         }
-        else{
-            this->execute_prepared_query(query);
-        }
+
+        sqlite3_finalize(stmt);
+        return feedback;
     }
     else{
         _SKIPPED_PREP_
