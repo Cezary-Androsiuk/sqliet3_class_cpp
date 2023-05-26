@@ -60,37 +60,6 @@ std::string SQLite3::read_row(sqlite3_stmt* stmt) const{
     return result;
 }
 
-std::vector<std::string> SQLite3::execute(const std::string& query){
-    if(this->db_open){
-        std::vector<std::string> feedback;
-        sqlite3_stmt* stmt;
-        int rc = sqlite3_prepare_v2(this->db, query.c_str(), -1, &stmt, nullptr);
-        if(rc != SQLITE_OK){
-            _PF_ERROR_
-            return feedback;
-        }
-
-        while(sqlite3_step(stmt) == SQLITE_ROW){
-            feedback.push_back(this->read_row(stmt));
-        }
-
-        if(feedback.size() > 0){
-            std::string c_name = "|";
-            for(int i=0; i<sqlite3_column_count(stmt); i++){
-                c_name += std::string(sqlite3_column_name(stmt, i)) + " | ";
-            }
-            feedback.push_back(c_name);
-        }
-
-        sqlite3_finalize(stmt);
-        return feedback;
-    }
-    else{
-        _PF_SKIPPED_OPEN_
-    }
-    return std::vector<std::string>();
-}
-
 
 void SQLite3::prepare_query(const std::string& query){
     if(this->db_open){
@@ -148,6 +117,18 @@ void SQLite3::bind_text_param(int pos, const std::string& param){
         _PF_SKIPPED_PREP_
     }
 }
+void SQLite3::bind_null_param(int pos){
+    if(this->prep_started){
+        int rc = sqlite3_bind_null(this->prep_stmt, pos)
+        if(rc != SQLITE_OK){
+            _PF_ERROR_
+            return;
+        }
+    }
+    else{
+        _PF_SKIPPED_PREP_
+    }
+}
 void SQLite3::bind_clear(){
     sqlite3_clear_bindings(this->prep_stmt);
 }
@@ -181,7 +162,6 @@ std::vector<std::string> SQLite3::execute_prepared(bool keep_open){
                 _PF_STMT_CLOSE_
             }
         }
-
 
         return feedback;
     }
