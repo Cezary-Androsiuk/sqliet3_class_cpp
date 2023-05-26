@@ -172,7 +172,7 @@ std::vector<std::string> SQLite3::execute_prepared(bool keep_open){
 }
 
 
-void SQLite3::close_prepared(){
+void SQLite3::clear_prepared_query(){
     int rc = sqlite3_finalize(this->prep_stmt);
     if(rc != SQLITE_OK){
         _PF_STMT_CLOSE_

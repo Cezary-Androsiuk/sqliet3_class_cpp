@@ -49,7 +49,7 @@ public:
 
     std::vector<std::string> execute_prepared(bool keep_open = true);
 
-    void close_prepared();
+    void clear_prepared_query();
 };
 
 #endif
