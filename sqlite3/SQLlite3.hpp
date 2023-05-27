@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-#include <typeinfo>
 
 #include "sqlite3.h"
 
